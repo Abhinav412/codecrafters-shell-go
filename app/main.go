@@ -25,8 +25,7 @@ func main() {
 		}
 		if command[:5] == "echo " {
 			fmt.Println(command[5 : len(command)-1])
-		}
-		if len(command) > 6 && command[:5] == "type" {
+		} else if len(command) > 6 && command[:5] == "type" {
 			cmd := command[5 : len(command)-1]
 			switch cmd {
 			case "echo":
