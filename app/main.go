@@ -24,7 +24,7 @@ func main() {
 		if command[:len(command)-1] == "exit 0" {
 			break
 		}
-		if strings.HasPrefix(command, "echo") {
+		if strings.HasPrefix(command, "echo ") {
 			fmt.Println(command[5 : len(command)-1])
 		} else if strings.HasPrefix(command, "type") {
 			argument := command[5:]
