@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
@@ -23,11 +24,11 @@ func main() {
 		if command[:len(command)-1] == "exit 0" {
 			break
 		}
-		if command[:5] == "echo " {
+		if strings.HasPrefix(command, "echo") {
 			fmt.Println(command[5 : len(command)-1])
-		} else if len(command) > 6 && command[:5] == "type" {
-			cmd := command[5 : len(command)-1]
-			switch cmd {
+		} else if strings.HasPrefix(command, "type") {
+			argument := command[5:]
+			switch argument {
 			case "echo":
 				fmt.Println("echo is a shell builtin")
 			case "exit":
@@ -35,7 +36,7 @@ func main() {
 			case "type":
 				fmt.Println("type is a shell builtin")
 			default:
-				fmt.Println(cmd + ": not found")
+				fmt.Println(argument + ": not found")
 			}
 		} else {
 			fmt.Println(command[:len(command)-1] + ": command not found")
