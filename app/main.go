@@ -26,15 +26,17 @@ func main() {
 		if command[:5] == "echo " {
 			fmt.Println(command[5 : len(command)-1])
 		}
-		if command[:5] == "type " {
-			if command[5:10] == "echo" {
+		if len(command) > 6 && command[:5] == "type" {
+			cmd := command[5 : len(command)-1]
+			switch cmd {
+			case "echo":
 				fmt.Println("echo is a shell builtin")
-			} else if command[5:len(command)-1] == "exit" {
+			case "exit":
 				fmt.Println("exit is a shell builtin")
-			} else if command[5:len(command)-1] == "type" {
+			case "type":
 				fmt.Println("type is a shell builtin")
-			} else {
-				fmt.Println(command[5:len(command)-1] + ": not found")
+			default:
+				fmt.Println(cmd + ": not found")
 			}
 		} else {
 			fmt.Println(command[:len(command)-1] + ": command not found")
