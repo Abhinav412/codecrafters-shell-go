@@ -32,10 +32,10 @@ func typeCMD(input []string) {
 	command := strings.Join(input, " ")
 	_, ok := COMMANDS[command]
 	if !ok {
-		fmt.Println("%v: not found\n", command)
+		fmt.Printf("%v: not found\n", command)
 		return
 	}
-	fmt.Println("%v is a shell builtin\n", command)
+	fmt.Printf("%v is a shell builtin\n", command)
 }
 
 func evaluate(input string) {
@@ -45,7 +45,7 @@ func evaluate(input string) {
 
 	output, ok := COMMANDS[command]
 	if !ok {
-		fmt.Println("%v: command not found\n", command)
+		fmt.Printf("%v: command not found\n", command)
 		return
 	}
 	output(optional)
