@@ -125,7 +125,9 @@ func findExecutable(command string) string {
 }
 
 func runExternalProgram(executablePath string, args []string) {
+	commandName := filepath.Base(executablePath)
 	cmd := exec.Command(executablePath, args...)
+	cmd.Args[0] = commandName
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
