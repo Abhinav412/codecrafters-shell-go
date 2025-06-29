@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -73,11 +74,18 @@ func evaluate(input string) {
 	command, optional := args[0], args[1:]
 
 	output, ok := COMMANDS[command]
-	if !ok {
-		fmt.Printf("%v: command not found\n", command)
+	if ok {
+		output(optional)
 		return
 	}
-	output(optional)
+
+	executablePath := findExecutable(command)
+	if executablePath != "" {
+		runExternalProgram(executablePath, optional)
+		return
+	}
+
+	fmt.Printf("%v: command not found\n", command)
 }
 
 func main() {
@@ -89,5 +97,40 @@ func main() {
 			os.Exit(1)
 		}
 		evaluate(command)
+	}
+}
+
+func findExecutable(command string) string {
+	pathEnv := os.Getenv("PATH")
+	paths := strings.Split(pathEnv, string(os.PathListSeparator))
+
+	for _, dir := range paths {
+		fullPath := filepath.Join(dir, command)
+		if fileInfo, err := os.Stat(fullPath); err == nil && !fileInfo.IsDir() {
+			if fileInfo.Mode()&0111 != 0 {
+				return fullPath
+			}
+		}
+		if strings.ToLower(filepath.Ext(command)) == "" {
+			fullPathWithExt := filepath.Join(dir, command+".exe")
+			if fileInfo, err := os.Stat(fullPathWithExt); err == nil && !fileInfo.IsDir() {
+				if fileInfo.Mode()&0111 != 0 {
+					return fullPathWithExt
+				}
+			}
+		}
+	}
+
+	return ""
+}
+
+func runExternalProgram(executablePath string, args []string) {
+	cmd := exec.Command(executablePath, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("Error executing command: %v\n", err)
 	}
 }
