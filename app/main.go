@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -29,13 +30,30 @@ func echoCMD(input []string) {
 }
 
 func typeCMD(input []string) {
-	command := strings.Join(input, " ")
-	_, ok := COMMANDS[command]
-	if !ok {
-		fmt.Printf("%v: not found\n", command)
+	if len(input) == 0 {
+		fmt.Println("type: missing argument")
 		return
 	}
-	fmt.Printf("%v is a shell builtin\n", command)
+
+	command := input[0]
+	_, ok := COMMANDS[command]
+	if ok {
+		fmt.Printf("%v is a shell builtin\n", command)
+		return
+	}
+
+	pathEnv := os.Getenv("PATH")
+	paths := strings.Split(pathEnv, string(os.PathListSeparator))
+
+	for _, dir := range paths {
+		fullPath := filepath.Join(dir, command)
+		if fileInfo, err := os.Stat(fullPath); err == nil && !fileInfo.IsDir() {
+			fmt.Printf("%v is %v\n", command, fullPath)
+			return
+		}
+	}
+
+	fmt.Printf("%v: not found\n", command)
 }
 
 func evaluate(input string) {
