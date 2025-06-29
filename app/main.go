@@ -48,8 +48,19 @@ func typeCMD(input []string) {
 	for _, dir := range paths {
 		fullPath := filepath.Join(dir, command)
 		if fileInfo, err := os.Stat(fullPath); err == nil && !fileInfo.IsDir() {
-			fmt.Printf("%v is %v\n", command, fullPath)
-			return
+			if fileInfo.Mode()&0111 != 0 {
+				fmt.Printf("%v is %v\n", command, fullPath)
+				return
+			}
+		}
+		if strings.ToLower(filepath.Ext(command)) == "" {
+			fullPathWithExt := filepath.Join(dir, command+".exe")
+			if fileInfo, err := os.Stat(fullPathWithExt); err == nil && !fileInfo.IsDir() {
+				if fileInfo.Mode()&0111 != 0 {
+					fmt.Printf("%v is %v\n", command, fullPathWithExt)
+					return
+				}
+			}
 		}
 	}
 
